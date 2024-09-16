@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 val signikaFontFamily = FontFamily(
     Font(R.font.signika_light, FontWeight.Light),
@@ -45,6 +46,7 @@ val signikaFontFamily = FontFamily(
 
 @Composable
 fun GPACalculator(modifier: Modifier = Modifier) {
+    val courseViewModel: CourseViewModel = viewModel()
 
     var course by remember {
         mutableStateOf("")
@@ -59,6 +61,16 @@ fun GPACalculator(modifier: Modifier = Modifier) {
     var credits by remember {
         mutableStateOf("")
     }
+
+    // Add course to the view model
+    fun addCourse() {
+        courseViewModel.addCourse(course, selectedGrade, credits)
+        // Clear the fields after adding
+        course = ""
+        selectedGrade = ""
+        credits = ""
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -117,7 +129,7 @@ fun GPACalculator(modifier: Modifier = Modifier) {
                         Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
-                            text = "3.49",
+                            text = "0.00",
                             fontFamily = signikaFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 40.sp,
@@ -173,7 +185,7 @@ fun GPACalculator(modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center
             ){
                 Button(
-                    onClick = { },
+                    onClick = { addCourse() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF5384e5),
                         contentColor = Color.White
@@ -197,7 +209,71 @@ fun GPACalculator(modifier: Modifier = Modifier) {
                     )
                 }
             }
+
         }
 
+        //Row for List Titles
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ){
+            Text(
+                text = "Course",
+                fontFamily = signikaFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 18.sp
+            )
+
+            Text(
+                text = "Grade",
+                fontFamily = signikaFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 18.sp
+            )
+
+            Text(
+                text = "Credits",
+                fontFamily = signikaFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 18.sp
+            )
+        }
+
+        CourseList(courseViewModel = courseViewModel)
+
+        //Box that holds "Compute GPA" button
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = { addCourse() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5384e5),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(30.dp),
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(50.dp)
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 10.dp)
+                    .shadow(
+                        elevation = 5.dp,
+                        shape = RoundedCornerShape(30.dp)
+                    )
+            ) {
+                Text(
+                    text = "Compute GPA",
+                    fontFamily = signikaFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 18.sp
+                )
+            }
+        }
     }
 }
