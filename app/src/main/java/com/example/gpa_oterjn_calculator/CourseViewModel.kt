@@ -17,4 +17,8 @@ class CourseViewModel : ViewModel() {
     fun removeCourse(course: Course) {
         courses.value -= course
     }
+
+    fun computeGpa(): Double {
+        return computeGPA(courses.value)
+    }
 }

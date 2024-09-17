@@ -52,7 +52,7 @@ fun GPACalculator(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
 
-    val grades = listOf("A", "B", "C", "D", "F")
+    val grades = listOf("A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F")
 
     var selectedGrade by remember {
         mutableStateOf("")
@@ -60,6 +60,10 @@ fun GPACalculator(modifier: Modifier = Modifier) {
 
     var credits by remember {
         mutableStateOf("")
+    }
+
+    var computedGPA by remember {
+        mutableStateOf(0.0)
     }
 
     // Add course to the view model
@@ -129,7 +133,7 @@ fun GPACalculator(modifier: Modifier = Modifier) {
                         Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
-                            text = "0.00",
+                            text = computedGPA.toString(),
                             fontFamily = signikaFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 40.sp,
@@ -251,7 +255,9 @@ fun GPACalculator(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = { addCourse() },
+                onClick = {
+                    computedGPA = courseViewModel.computeGpa()
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF5384e5),
                     contentColor = Color.White
