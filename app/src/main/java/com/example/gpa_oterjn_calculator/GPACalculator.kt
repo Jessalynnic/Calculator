@@ -45,7 +45,7 @@ val signikaFontFamily = FontFamily(
 )
 
 @Composable
-fun GPACalculator(modifier: Modifier = Modifier) {
+fun GPACalculator() {
     val courseViewModel: CourseViewModel = viewModel()
 
     var course by remember {
@@ -64,6 +64,24 @@ fun GPACalculator(modifier: Modifier = Modifier) {
 
     var computedGPA by remember {
         mutableStateOf(0.0)
+    }
+
+    fun gpaBoxColor(gpa: Double): Color {
+        return if (gpa == 0.0) Color(0xFFdbe5fa)
+        else when {
+            gpa < 2.0 -> Color.Red
+            gpa < 3.3 -> Color.Yellow
+            else -> Color.Green
+        }
+    }
+
+    fun gpaTextColor(gpa: Double): Color {
+        return when {
+            gpa == 0.0 -> Color.Black
+            gpa < 2.0 -> Color.Red
+            gpa < 3.3 -> Color.Yellow
+            else -> Color.Green
+        }
     }
 
     // Add course to the view model
@@ -108,7 +126,7 @@ fun GPACalculator(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .size(160.dp) // Larger background shadow layer
                     .background( // Custom colored shadow effect
-                        color = Color(0xFFdbe5fa),
+                        color = gpaBoxColor(computedGPA),
                         shape = CircleShape
                     )
                     .padding(10.dp)
@@ -133,15 +151,15 @@ fun GPACalculator(modifier: Modifier = Modifier) {
                         Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
-                            text = computedGPA.toString(),
+                            text = String.format("%.2f", computedGPA),
                             fontFamily = signikaFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 40.sp,
+                            color = gpaTextColor(computedGPA)
                         )
                     }
                 }
             }
-
         }
 
         Column {
