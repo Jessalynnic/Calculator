@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -48,23 +49,16 @@ val signikaFontFamily = FontFamily(
 fun GPACalculator() {
     val courseViewModel: CourseViewModel = viewModel()
 
-    var course by remember {
-        mutableStateOf("")
-    }
-
+    var course by remember { mutableStateOf("") }
     val grades = listOf("A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F")
+    var selectedGrade by remember { mutableStateOf("") }
+    var credits by remember { mutableStateOf("") }
 
-    var selectedGrade by remember {
-        mutableStateOf("")
-    }
+    var isValidCourse by remember { mutableStateOf(true) }
+    var isValidCredits by remember { mutableStateOf(true) }
+    var isAllFieldsFilled by remember { mutableStateOf(true) }
 
-    var credits by remember {
-        mutableStateOf("")
-    }
-
-    var computedGPA by remember {
-        mutableStateOf(0.0)
-    }
+    var computedGPA by remember { mutableStateOf(0.0) }
 
     fun gpaBoxColor(gpa: Double): Color {
         return if (gpa == 0.0) Color(0xFFdbe5fa)
@@ -79,18 +73,38 @@ fun GPACalculator() {
         return when {
             gpa == 0.0 -> Color.Black
             gpa < 2.0 -> Color.Red
-            gpa < 3.3 -> Color.Yellow
+            gpa < 3.3 -> Color(0xFFebeb00)
             else -> Color.Green
         }
     }
 
+    fun validateCourseFormat(courseName: String): Boolean {
+        val coursePattern = Regex("^[A-Za-z]{3}\\d{3}$")
+        return coursePattern.matches(courseName)
+    }
+
+    fun validateCreditsFormat(credits: String): Boolean {
+        return credits.toDoubleOrNull()?.let { it in 1.0..5.0 } ?: false
+    }
+
     // Add course to the view model
     fun addCourse() {
-        courseViewModel.addCourse(course, selectedGrade, credits)
-        // Clear the fields after adding
-        course = ""
-        selectedGrade = ""
-        credits = ""
+
+        val isValidCourseFormat = validateCourseFormat(course)
+        val isValidCreditsFormat = validateCreditsFormat(credits)
+        val areFieldsFilled = course.isNotEmpty() && selectedGrade.isNotEmpty() && credits.isNotEmpty()
+
+        isValidCourse = isValidCourseFormat
+        isValidCredits = isValidCreditsFormat
+        isAllFieldsFilled = areFieldsFilled
+
+        if (isValidCourseFormat && isValidCreditsFormat && areFieldsFilled) {
+            courseViewModel.addCourse(course, selectedGrade, credits)
+            // Clear the fields after adding
+            course = ""
+            selectedGrade = ""
+            credits = ""
+        }
     }
 
 
@@ -171,33 +185,55 @@ fun GPACalculator() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                //Text field for Course input
-                CustomTextField(
-                    value = course,
-                    onValueChange = {
-                        course = it
-                    },
-                    placeholder = "Course"
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                ) {
+                    //Text field for Course input
+                    CustomTextField(
+                        value = course,
+                        onValueChange = {
+                            course = it
+                        },
+                        placeholder = "Course (ex.BCS430)",
+                        isCourseField = true,
+                        showError = !isValidCourse || !isAllFieldsFilled,
+                        errorMessage = if (!isAllFieldsFilled) "Course field cannot be empty." else "Invalid format. Use 3 letters + 3 digits (e.g., BCS430)"
+                    )
+                }
 
-                GradeDropdown(
-                    selectedGrade = selectedGrade,
-                    grades = grades,
-                    onGradeSelected = {
-                        selectedGrade = it
-                    }
-                )
-
-                //Text field for Credit input
-                CustomTextField(
-                    value = credits,
-                    onValueChange = {
-                        credits = it
-                    },
-                    placeholder = "Credits",
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                ) {
+                    GradeDropdown(
+                        selectedGrade = selectedGrade,
+                        grades = grades,
+                        onGradeSelected = {
+                            selectedGrade = it
+                        }
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                ) {
+                    //Text field for Credit input
+                    CustomTextField(
+                        value = credits,
+                        onValueChange = {
+                            credits = it
+                        },
+                        placeholder = "Credits (ex.3.0)",
+                        isCreditsField = true,
+                        showError = !isValidCredits || !isAllFieldsFilled,
+                        errorMessage = if (!isAllFieldsFilled) "Credits field cannot be empty." else "Credits must be between 1.0 and 5.0.",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
             }
 
             //Box that holds "Add Course" button
@@ -231,7 +267,6 @@ fun GPACalculator() {
                     )
                 }
             }
-
         }
 
         //Row for List Titles

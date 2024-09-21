@@ -3,6 +3,7 @@ package com.example.gpa_oterjn_calculator
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -34,6 +35,10 @@ fun CustomTextField(
     width: Dp = 120.dp,
     height: Dp = 50.dp,
     fontFamily: FontFamily = signikaFontFamily,
+    isCourseField: Boolean = false,
+    isCreditsField: Boolean = false,
+    showError: Boolean = false,
+    errorMessage: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -63,6 +68,7 @@ fun CustomTextField(
             fontFamily = fontFamily
         ),
         visualTransformation = visualTransformation,
+        isError = showError,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         modifier = Modifier
@@ -80,4 +86,13 @@ fun CustomTextField(
             }
 
     )
+
+    if (showError) {
+        Text(
+            text = errorMessage,
+            color = Color.Red,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
 }
