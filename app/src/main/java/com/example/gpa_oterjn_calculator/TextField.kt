@@ -30,26 +30,27 @@ import androidx.compose.ui.unit.sp
 fun CustomTextField(
     modifier: Modifier = Modifier,
     value: String,
-    onValueChange: (String) -> Unit,
+    onValueChange: (String) -> Unit, // Lambda function to handle changes to the text input
     placeholder: String = "",
     width: Dp = 120.dp,
     height: Dp = 50.dp,
     fontFamily: FontFamily = signikaFontFamily,
     isCourseField: Boolean = false,
     isCreditsField: Boolean = false,
-    showError: Boolean = false,
-    errorMessage: String = "",
+    showError: Boolean = false, // Determines whether to show the error message
+    errorMessage: String = "", // The error message to display if `showError` is true
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    autoFocus: Boolean = false
+    autoFocus: Boolean = false // If true, the TextField will be automatically focused when displayed
 ) {
+    // Remember and manage a FocusRequester to control focus on the TextField
     val focusRequester = remember { FocusRequester() }
 
     // Focus request is triggered when autoFocus is true
     if (autoFocus) {
         LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+            focusRequester.requestFocus() // Requests focus to the TextField when the UI is launched
         }
     }
 
@@ -80,16 +81,16 @@ fun CustomTextField(
                 elevation = 5.dp,
                 shape = RoundedCornerShape(5.dp)
             )
-            .focusRequester(focusRequester)
+            .focusRequester(focusRequester) // Binds the TextField to a FocusRequester, allowing for focus control
             .clickable {
                 focusRequester.requestFocus() // Request focus when clicked
             }
 
     )
-
+    // Display an error message if `showError` is true
     if (showError) {
         Text(
-            text = errorMessage,
+            text = errorMessage, // The error message text to display
             color = Color.Red,
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp)

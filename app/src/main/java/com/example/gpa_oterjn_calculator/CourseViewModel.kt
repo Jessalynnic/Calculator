@@ -33,4 +33,10 @@ class CourseViewModel : ViewModel() {
     private fun recalculateGPA() {
         gpa.value = computeGPA(courses.value)  // Recalculate GPA and update state
     }
+
+    // Function to clear all courses
+    fun clearCourses() {
+        courses.value = listOf()  // Set the course list to an empty list
+        gpa.value = 0.0  // Reset GPA as well
+    }
 }

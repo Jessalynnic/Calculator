@@ -50,6 +50,7 @@ val signikaFontFamily = FontFamily(
 
 @Composable
 fun GPACalculator() {
+    // ViewModel instance to manage the state and business logic for the GPA calculator
     val courseViewModel: CourseViewModel = viewModel()
 
     var course by remember { mutableStateOf("") }
@@ -57,16 +58,22 @@ fun GPACalculator() {
     var selectedGrade by remember { mutableStateOf("") }
     var credits by remember { mutableStateOf("") }
 
+    // State variables for input validation
     var isValidCourse by remember { mutableStateOf(true) }
     var isValidCredits by remember { mutableStateOf(true) }
     var isAllFieldsFilled by remember { mutableStateOf(true) }
 
+    // State variable to track whether GPA has been computed
+    var isGpaComputed by remember { mutableStateOf(false) }
+
+    // Detecting device orientation
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     // Wrapping content in scrollable Column only in landscape mode
     val scrollState = rememberScrollState()
 
+    // Function to determine the color of the GPA box based on GPA value
     fun gpaBoxColor(gpa: Double): Color {
         return if (gpa == 0.0) Color(0xFFdbe5fa)
         else when {
@@ -76,6 +83,7 @@ fun GPACalculator() {
         }
     }
 
+    // Function to determine the text color based on GPA value
     fun gpaTextColor(gpa: Double): Color {
         return when {
             gpa == 0.0 -> Color.Black
@@ -85,26 +93,30 @@ fun GPACalculator() {
         }
     }
 
+    // Validate the format of the course input (e.g., BCS430)
     fun validateCourseFormat(courseName: String): Boolean {
         val coursePattern = Regex("^[A-Za-z]{3}\\d{3}$")
         return coursePattern.matches(courseName)
     }
 
+    // Validate the format of the credits input (e.g., between 1.0 and 5.0)
     fun validateCreditsFormat(credits: String): Boolean {
         return credits.toDoubleOrNull()?.let { it in 1.0..5.0 } ?: false
     }
 
-    // Add course to the view model
+    // Function to add a course and reset the input fields after validation
     fun addCourse() {
-
+        // Validate inputs
         val isValidCourseFormat = validateCourseFormat(course)
         val isValidCreditsFormat = validateCreditsFormat(credits)
         val areFieldsFilled = course.isNotEmpty() && selectedGrade.isNotEmpty() && credits.isNotEmpty()
 
+        // Update validation states
         isValidCourse = isValidCourseFormat
         isValidCredits = isValidCreditsFormat
         isAllFieldsFilled = areFieldsFilled
 
+        // If all inputs are valid, add the course and reset the fields
         if (isValidCourseFormat && isValidCreditsFormat && areFieldsFilled) {
             courseViewModel.addCourse(course, selectedGrade, credits)
             // Clear the fields after adding
@@ -114,7 +126,7 @@ fun GPACalculator() {
         }
     }
 
-
+    // Column that holds the entire layout
     Column(
         modifier = if (isLandscape) Modifier
             .fillMaxSize()
@@ -123,10 +135,11 @@ fun GPACalculator() {
         horizontalAlignment = if (isLandscape) Alignment.CenterHorizontally else Alignment.CenterHorizontally,
         verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.Top
     ) {
+        // Header box displaying "GPA Calculator" text
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF5384e5))
+                .background(Color(0xFF5384e5)) // Blue background
                 .padding(vertical = 30.dp),
             contentAlignment = Alignment.BottomCenter
         ){
@@ -147,7 +160,7 @@ fun GPACalculator() {
                 .padding(vertical = 18.dp),
             contentAlignment = Alignment.Center
         ){
-            Box( //Outer box for circle
+            Box( // Outer circular box with a background color based on GPA
                 modifier = Modifier
                     .size(160.dp) // Larger background shadow layer
                     .background( // Custom colored shadow effect
@@ -163,6 +176,7 @@ fun GPACalculator() {
                         .background(Color.White),
                     contentAlignment = Alignment.Center
                 ) {
+                    // Column for displaying the GPA label and the GPA value
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
@@ -173,8 +187,10 @@ fun GPACalculator() {
                             fontSize = 20.sp,
                         )
 
+                        // Space between text and GPA value
                         Spacer(modifier = Modifier.height(5.dp))
 
+                        // Display the GPA value
                         Text(
                             text = String.format("%.2f", courseViewModel.gpa.value),
                             fontFamily = signikaFontFamily,
@@ -187,6 +203,7 @@ fun GPACalculator() {
             }
         }
 
+        // Input fields and buttons for course, grade, and credits
         Column {
             //Row that holds Course, Grade and Credits fields
             Row(
@@ -196,6 +213,7 @@ fun GPACalculator() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
+                // Column for course input field
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -214,11 +232,13 @@ fun GPACalculator() {
                     )
                 }
 
+                // Column for grade dropdown
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp)
                 ) {
+                    // Dropdown for grade selection
                     GradeDropdown(
                         selectedGrade = selectedGrade,
                         grades = grades,
@@ -227,6 +247,7 @@ fun GPACalculator() {
                         }
                     )
                 }
+                // Column for credits input field
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -254,7 +275,7 @@ fun GPACalculator() {
                 contentAlignment = Alignment.Center
             ){
                 Button(
-                    onClick = { addCourse() },
+                    onClick = { addCourse() }, // Add course when clicked
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF5384e5),
                         contentColor = Color.White
@@ -280,7 +301,7 @@ fun GPACalculator() {
             }
         }
 
-        //Row for List Titles
+        // Row that holds the list titles for Course, Grade, and Credits
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -310,9 +331,10 @@ fun GPACalculator() {
             )
         }
 
+        // List of courses added
         CourseList(courseViewModel = courseViewModel)
 
-        //Box that holds "Compute GPA" button
+        //Box that holds "Compute GPA" or "Clear List" button
         Box(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -320,7 +342,15 @@ fun GPACalculator() {
         ) {
             Button(
                 onClick = {
-                    courseViewModel.computeGpa()
+                    if (isGpaComputed) {
+                        // Clear the course list if GPA is already computed
+                        courseViewModel.clearCourses()
+                        isGpaComputed = false  // Reset the flag after clearing
+                    } else {
+                        // Compute GPA and change the button to "Clear List"
+                        courseViewModel.computeGpa()
+                        isGpaComputed = true  // GPA has been computed
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF5384e5),
@@ -338,7 +368,8 @@ fun GPACalculator() {
                     )
             ) {
                 Text(
-                    text = "Compute GPA",
+                    // Toggle text between "Compute GPA" and "Clear List" based on the GPA computed state
+                    text = if (isGpaComputed) "Clear List" else "Compute GPA",
                     fontFamily = signikaFontFamily,
                     fontWeight = FontWeight.Normal,
                     fontSize = 18.sp

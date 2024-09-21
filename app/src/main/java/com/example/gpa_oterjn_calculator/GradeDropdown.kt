@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GradeDropdown(
     selectedGrade: String,
+    // List of grades to display in the dropdown
     grades: List<String>,
+    // Callback function when a grade is selected
     onGradeSelected: (String) -> Unit
 ) {
+    // State to track whether the dropdown menu is expanded or not
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -33,7 +36,7 @@ fun GradeDropdown(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
-            expanded = !expanded
+            expanded = !expanded // Toggle the expanded state when clicked
         }
     ) {
         // TextField to show the selected grade
@@ -46,28 +49,30 @@ fun GradeDropdown(
                 )
             },
             readOnly = true,
+            // The dropdown icon at the end of the TextField
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor() // Ensures the dropdown is aligned with the TextField
                 .height(50.dp)
                 .width(120.dp) // width of text field
                 .clip(RoundedCornerShape(30.dp))
 
         )
 
-        // Dropdown Menu
+        // DropdownMenu that contains the list of grades
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false } // Collapse the menu when it's dismissed
         ) {
+            // Loop through the list of grades and create a DropdownMenuItem for each
             grades.forEach { grade ->
                 DropdownMenuItem(
                     text = {
                         Text(text = grade)
                     },
                     onClick = {
-                        onGradeSelected(grade)
-                        expanded = false
+                        onGradeSelected(grade) // Call the callback to update the selected grade
+                        expanded = false // Collapse the dropdown after selecting a grade
                     }
                 )
             }

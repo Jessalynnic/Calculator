@@ -34,13 +34,16 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CourseList(courseViewModel: CourseViewModel) {
+    // LazyColumn to display a scrollable list of courses
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .height(350.dp)
             .padding(top = 5.dp)
     ) {
+        // Loop through the list of courses from the ViewModel
         items(courseViewModel.courses.value) { courseItem ->
+            // Display each course item as a swipe-to-dismiss item
             SwipeToDismissItem(courseItem, courseViewModel)
         }
     }
@@ -48,29 +51,35 @@ fun CourseList(courseViewModel: CourseViewModel) {
 
 @Composable
 fun SwipeToDismissItem(courseItem: Course, courseViewModel: CourseViewModel) {
+    // Track whether the item has been dismissed
     var isDismissed by remember { mutableStateOf(false) }
 
+    // Only show the item if it hasn't been dismissed
     if (!isDismissed) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFdbe5fa))
                 .clip(RoundedCornerShape(10.dp))
-                .shadow(1.dp)
+                .shadow(1.dp) // Shadow for slight elevation effect
                 .padding(10.dp)
                 .pointerInput(Unit) {
+                    // Detect long press gesture to dismiss the item
                     detectTapGestures(onLongPress = {
                         isDismissed = true
+                        // Remove the course from ViewModel
                         courseViewModel.removeCourse(courseItem)
                     })
                 }
         ) {
+            // Row to hold the course details (name, grade, credits) and delete icon
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(50.dp))
 
+                // Display course name
                 Text(
                     text = courseItem.name,
                     fontFamily = signikaFontFamily,
@@ -80,6 +89,7 @@ fun SwipeToDismissItem(courseItem: Course, courseViewModel: CourseViewModel) {
 
                 Spacer(modifier = Modifier.width(65.dp))
 
+                // Display course grade
                 Text(
                     text = courseItem.grade,
                     fontFamily = signikaFontFamily,
@@ -89,6 +99,7 @@ fun SwipeToDismissItem(courseItem: Course, courseViewModel: CourseViewModel) {
 
                 Spacer(modifier = Modifier.width(89.dp))
 
+                // Display course credits
                 Text(
                     text = courseItem.credits,
                     fontFamily = signikaFontFamily,
@@ -98,12 +109,14 @@ fun SwipeToDismissItem(courseItem: Course, courseViewModel: CourseViewModel) {
 
                 Spacer(modifier = Modifier.width(35.dp))
 
+                // Delete button with a red trash icon
                 IconButton(onClick = {
                     isDismissed = true
+                    // Remove the course from ViewModel
                     courseViewModel.removeCourse(courseItem)
                 }) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        imageVector = Icons.Default.Delete, // Trash icon
                         contentDescription = "Delete",
                         tint = Color.Red
                     )
