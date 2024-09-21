@@ -1,6 +1,7 @@
 package com.example.gpa_oterjn_calculator
 
 
+
 fun getGradePoint(grade: String): Double {
     return when (grade) {
         "A+", "A" -> 4.0

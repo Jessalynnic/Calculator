@@ -140,7 +140,7 @@ fun GPACalculator() {
                 modifier = Modifier
                     .size(160.dp) // Larger background shadow layer
                     .background( // Custom colored shadow effect
-                        color = gpaBoxColor(computedGPA),
+                        color = gpaBoxColor(courseViewModel.gpa.value),
                         shape = CircleShape
                     )
                     .padding(10.dp)
@@ -165,11 +165,11 @@ fun GPACalculator() {
                         Spacer(modifier = Modifier.height(5.dp))
 
                         Text(
-                            text = String.format("%.2f", computedGPA),
+                            text = String.format("%.2f", courseViewModel.gpa.value),
                             fontFamily = signikaFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 40.sp,
-                            color = gpaTextColor(computedGPA)
+                            color = gpaTextColor(courseViewModel.gpa.value)
                         )
                     }
                 }
@@ -309,7 +309,7 @@ fun GPACalculator() {
         ) {
             Button(
                 onClick = {
-                    computedGPA = courseViewModel.computeGpa()
+                    courseViewModel.computeGpa()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF5384e5),

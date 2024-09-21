@@ -7,6 +7,11 @@ class CourseViewModel : ViewModel() {
     var courses = mutableStateOf(listOf<Course>())
         private set
 
+    // variable to store the current GPA
+    var gpa = mutableStateOf(0.0)
+        private set
+
+    // Function to add a course to a list
     fun addCourse(courseName: String, grade: String, credits: String) {
         if (courseName.isNotEmpty() && grade.isNotEmpty() && credits.isNotEmpty()) {
             val newCourse = Course(courseName, grade, credits)
@@ -14,11 +19,18 @@ class CourseViewModel : ViewModel() {
         }
     }
 
+    // Function to remove a course and recalculate GPA
     fun removeCourse(course: Course) {
         courses.value -= course
+        recalculateGPA() // Recalculate GPA after removing a course
     }
 
-    fun computeGpa(): Double {
-        return computeGPA(courses.value)
+    fun computeGpa() {
+        gpa.value = computeGPA(courses.value)
+    }
+
+    // Function to recalculate GPA based on the current list of courses
+    private fun recalculateGPA() {
+        gpa.value = computeGPA(courses.value)  // Recalculate GPA and update state
     }
 }
