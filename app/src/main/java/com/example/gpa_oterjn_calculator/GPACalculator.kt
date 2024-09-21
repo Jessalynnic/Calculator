@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +61,11 @@ fun GPACalculator() {
     var isValidCredits by remember { mutableStateOf(true) }
     var isAllFieldsFilled by remember { mutableStateOf(true) }
 
-    var computedGPA by remember { mutableStateOf(0.0) }
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+    // Wrapping content in scrollable Column only in landscape mode
+    val scrollState = rememberScrollState()
 
     fun gpaBoxColor(gpa: Double): Color {
         return if (gpa == 0.0) Color(0xFFdbe5fa)
@@ -109,8 +116,12 @@ fun GPACalculator() {
 
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = if (isLandscape) Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState) // Scrollable in landscape mode
+        else Modifier.fillMaxSize(),
+        horizontalAlignment = if (isLandscape) Alignment.CenterHorizontally else Alignment.CenterHorizontally,
+        verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.Top
     ) {
         Box(
             modifier = Modifier
